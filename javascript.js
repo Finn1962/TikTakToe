@@ -82,3 +82,5 @@ const spiel = spielLogik();
 while(!spiel.neueRunde()){
     erstelleSpielfeld.anzeigeSpielfeld();
 }
+
+alert("Spiel beendet!");
