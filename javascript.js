@@ -28,10 +28,12 @@ const spielLogik = ()=>{
     function neueRunde(){ 
         eingabeZug(spieler1);
         if (pruefeGewinner("X")) {
+            alert(`Spiel beendet! ${spieler1.name} hat gewonnen!`);
             return true;
         };
         eingabeZug(spieler2);   
         if (pruefeGewinner("O")) {
+            alert(`Spiel beendet! ${spieler2.name} hat gewonnen!`);
             return true;
         };
         return false;
@@ -81,5 +83,3 @@ while(!spiel.neueRunde()){
     erstelleSpielfeld.ausgabeSpielfeld();
     if (spiel.neueRunde()) break;
 }
-
-alert("Spiel beendet!");
