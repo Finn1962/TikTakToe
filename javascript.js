@@ -9,7 +9,6 @@ const spieler = (name, marker) => {
     }
 }
 
-
 //Spielfeld erstellen
 const erstelleSpielfeld = (function(){
     const spielfeld = [["","",""],["","",""],["","",""]];
@@ -63,9 +62,13 @@ const spielLogik = ()=>{
         };
     };
     
+    function istBeendet(){
+        return spielBeendet;
+    }
+
     return {
         neueRunde,
-        get spielBeendet(){ return spielBeendet; },
+        istBeendet,
     };
 };
 
@@ -75,7 +78,7 @@ const spieler1 = spieler("Tom","X");
 const spieler2 = spieler("Alice","O");
 const spiel = spielLogik(); 
 
-while(!spiel.spielBeendet){
+while(!spiel.istBeendet()){
     spiel.neueRunde();
     erstelleSpielfeld.ausgabeSpielfeld();
 }
