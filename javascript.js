@@ -14,7 +14,7 @@ const erstelleSpielfeld = (function(){
     const spielfeld = [["","",""],["","",""],["","",""]];
     return {
         spielfeld,
-        ausgabeSpielfeld(){
+        anzeigeSpielfeld(){
             console.log(spielfeld);
         }
     }
@@ -80,6 +80,5 @@ const spieler2 = spieler("Alice","O");
 const spiel = spielLogik(); 
 
 while(!spiel.neueRunde()){
-    erstelleSpielfeld.ausgabeSpielfeld();
-    if (spiel.neueRunde()) break;
+    erstelleSpielfeld.anzeigeSpielfeld();
 }
