@@ -15,7 +15,7 @@ const erstelleSpielfeld = (function(){
     return {
         spielfeld,
         ausgabeSpielfeld(){
-            console.log(erstelleSpielfeld.spielfeld);
+            console.log(spielfeld);
         }
     }
 })();
@@ -24,63 +24,62 @@ const erstelleSpielfeld = (function(){
 const spielLogik = ()=>{
     let eingabeXKor;
     let eingabeYKor;
-    let spielBeendet = false;
 
-    function neueRunde(){
-        if (spielBeendet) return;
+    function neueRunde(){ 
         eingabeZug(spieler1);
-        pruefeGewinner("X");
-        if (spielBeendet) return;
-        eingabeZug(spieler2);
-        pruefeGewinner("O");        
-        
-        function eingabeZug(spieler){
+        if (pruefeGewinner("X")) {
+            return true;
+        };
+        eingabeZug(spieler2);   
+        if (pruefeGewinner("O")) {
+            return true;
+        };
+        return false;
+    };  
+
+    function eingabeZug(spieler){
+        eingabeXKor = Number(prompt(`${spieler.name} ist dran. X-Koordinate:`));
+        eingabeYKor = Number(prompt(`${spieler.name} ist dran. Y-Koordinate:`));
+        while(erstelleSpielfeld.spielfeld[eingabeYKor][eingabeXKor] !== ""){
+            alert("Feld bereits belegt. Bitte erneut eingeben.");
             eingabeXKor = Number(prompt(`${spieler.name} ist dran. X-Koordinate:`));
             eingabeYKor = Number(prompt(`${spieler.name} ist dran. Y-Koordinate:`));
-            while(erstelleSpielfeld.spielfeld[eingabeYKor][eingabeXKor] !== ""){
-                alert("Feld bereits belegt. Bitte erneut eingeben.");
-                eingabeXKor = Number(prompt(`${spieler.name} ist dran. X-Koordinate:`));
-                eingabeYKor = Number(prompt(`${spieler.name} ist dran. Y-Koordinate:`));
-            }
-            erstelleSpielfeld.spielfeld[eingabeYKor][eingabeXKor] = spieler.marker;
         }
-
-        function pruefeGewinner(XO){
-            if((erstelleSpielfeld.spielfeld[0][0] == XO && erstelleSpielfeld.spielfeld[0][1] == XO && erstelleSpielfeld.spielfeld[0][2] == XO)||
-            (erstelleSpielfeld.spielfeld[1][0] == XO && erstelleSpielfeld.spielfeld[1][1] == XO && erstelleSpielfeld.spielfeld[1][2] == XO)||
-            (erstelleSpielfeld.spielfeld[2][0] == XO && erstelleSpielfeld.spielfeld[2][1] == XO && erstelleSpielfeld.spielfeld[2][2] == XO)||
-
-            (erstelleSpielfeld.spielfeld[0][0] == XO && erstelleSpielfeld.spielfeld[1][0] == XO && erstelleSpielfeld.spielfeld[2][0] == XO)||
-            (erstelleSpielfeld.spielfeld[0][1] == XO && erstelleSpielfeld.spielfeld[1][1] == XO && erstelleSpielfeld.spielfeld[2][1] == XO)||
-            (erstelleSpielfeld.spielfeld[0][2] == XO && erstelleSpielfeld.spielfeld[1][2] == XO && erstelleSpielfeld.spielfeld[2][2] == XO)||
-
-            (erstelleSpielfeld.spielfeld[0][0] == XO && erstelleSpielfeld.spielfeld[1][1] == XO && erstelleSpielfeld.spielfeld[2][2] == XO)||
-            (erstelleSpielfeld.spielfeld[2][0] == XO && erstelleSpielfeld.spielfeld[1][1] == XO && erstelleSpielfeld.spielfeld[0][2] == XO)
-            ){
-                spielBeendet = true;
-            }
-        };
-    };
-    
-    function istBeendet(){
-        return spielBeendet;
+        erstelleSpielfeld.spielfeld[eingabeYKor][eingabeXKor] = spieler.marker;
     }
 
+    function pruefeGewinner(XO){
+        if((erstelleSpielfeld.spielfeld[0][0] == XO && erstelleSpielfeld.spielfeld[0][1] == XO && erstelleSpielfeld.spielfeld[0][2] == XO)||
+        (erstelleSpielfeld.spielfeld[1][0] == XO && erstelleSpielfeld.spielfeld[1][1] == XO && erstelleSpielfeld.spielfeld[1][2] == XO)||
+        (erstelleSpielfeld.spielfeld[2][0] == XO && erstelleSpielfeld.spielfeld[2][1] == XO && erstelleSpielfeld.spielfeld[2][2] == XO)||
+
+        (erstelleSpielfeld.spielfeld[0][0] == XO && erstelleSpielfeld.spielfeld[1][0] == XO && erstelleSpielfeld.spielfeld[2][0] == XO)||
+        (erstelleSpielfeld.spielfeld[0][1] == XO && erstelleSpielfeld.spielfeld[1][1] == XO && erstelleSpielfeld.spielfeld[2][1] == XO)||
+        (erstelleSpielfeld.spielfeld[0][2] == XO && erstelleSpielfeld.spielfeld[1][2] == XO && erstelleSpielfeld.spielfeld[2][2] == XO)||
+
+        (erstelleSpielfeld.spielfeld[0][0] == XO && erstelleSpielfeld.spielfeld[1][1] == XO && erstelleSpielfeld.spielfeld[2][2] == XO)||
+        (erstelleSpielfeld.spielfeld[2][0] == XO && erstelleSpielfeld.spielfeld[1][1] == XO && erstelleSpielfeld.spielfeld[0][2] == XO)
+        ){
+            return true;
+        } else {
+            return false;
+        }
+    };
+    
     return {
         neueRunde,
-        istBeendet,
+        pruefeGewinner,
     };
 };
-
 
 //Globaler Code
 const spieler1 = spieler("Tom","X");
 const spieler2 = spieler("Alice","O");
 const spiel = spielLogik(); 
 
-while(!spiel.istBeendet()){
-    spiel.neueRunde();
+while(!spiel.neueRunde()){
     erstelleSpielfeld.ausgabeSpielfeld();
+    if (spiel.neueRunde()) break;
 }
 
 alert("Spiel beendet!");
