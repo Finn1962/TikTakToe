@@ -21,25 +21,44 @@ const erstelleSpielfeld = (function(){
 
 //Spiel Logik
 const spielLogik = ()=>{
-    const spieler1 = spieler("spieler1","X");
-    const spieler2 = spieler("spieler2","O");
+    const spieler1 = spieler(prompt("Bitte den Namen für Spieler.1 Eingeben."),"X");
+    const spieler2 = spieler(prompt("Bitte den Namen für Spieler.2 Eingeben."),"O");
+    if (spieler1.name == "" || spieler1.name == undefined) spieler1.name = "Spieler.1";
+    if (spieler2.name == "" || spieler2.name == undefined) spieler2.name = "Spieler.2";
     let aktiverSpieler = 1;
+    let spielfeldEinfrieren = false;
 
     function neueRunde() {
-        if (!frontendVerbindung.state.klickInSpielfeld) return;
+        if (spielfeldEinfrieren || !frontendVerbindung.state.klickInSpielfeld) return;
         frontendVerbindung.state.klickInSpielfeld = false;   
         if (aktiverSpieler == 1) {
             eingabeSpielzug(spieler1);
             console.log(erstelleSpielfeld.spielfeld);
+            frontendVerbindung.aenderungenUebernehmenImDom();
             if (pruefenVonGewinner("X")) {
                 alert(`Spiel beendet! ${spieler1.name} hat gewonnen!`);
+                spielfeldEinfrieren = true;
+                return;
             };
+            if (erstelleSpielfeld.spielfeld.flat().every(pruefenUnentschieden)){
+                alert("Spiel beendet! Unentschieden!");
+                spielfeldEinfrieren = true;
+                return;
+            }; 
             aktiverSpieler = 2;
         } else if (aktiverSpieler == 2){
             eingabeSpielzug(spieler2);   
             console.log(erstelleSpielfeld.spielfeld);
+            frontendVerbindung.aenderungenUebernehmenImDom();
             if (pruefenVonGewinner("O")) {
                 alert(`Spiel beendet! ${spieler2.name} hat gewonnen!`);
+                spielfeldEinfrieren = true;
+                return;
+            };
+            if (erstelleSpielfeld.spielfeld.flat().every(pruefenUnentschieden)){
+                alert("Spiel beendet! Unentschieden!");
+                spielfeldEinfrieren = true;
+                return;
             };
             aktiverSpieler = 1;
         }
@@ -51,29 +70,41 @@ const spielLogik = ()=>{
             return;
         }
         erstelleSpielfeld.spielfeld[frontendVerbindung.state.YKoorKachel][frontendVerbindung.state.XKoorKachel] = spieler.marker;
-    }
-    
-    function pruefenVonGewinner(XO){
-        if((erstelleSpielfeld.spielfeld[0][0] == XO && erstelleSpielfeld.spielfeld[0][1] == XO && erstelleSpielfeld.spielfeld[0][2] == XO)||
-        (erstelleSpielfeld.spielfeld[1][0] == XO && erstelleSpielfeld.spielfeld[1][1] == XO && erstelleSpielfeld.spielfeld[1][2] == XO)||
-        (erstelleSpielfeld.spielfeld[2][0] == XO && erstelleSpielfeld.spielfeld[2][1] == XO && erstelleSpielfeld.spielfeld[2][2] == XO)||
+    };
 
-        (erstelleSpielfeld.spielfeld[0][0] == XO && erstelleSpielfeld.spielfeld[1][0] == XO && erstelleSpielfeld.spielfeld[2][0] == XO)||
-        (erstelleSpielfeld.spielfeld[0][1] == XO && erstelleSpielfeld.spielfeld[1][1] == XO && erstelleSpielfeld.spielfeld[2][1] == XO)||
-        (erstelleSpielfeld.spielfeld[0][2] == XO && erstelleSpielfeld.spielfeld[1][2] == XO && erstelleSpielfeld.spielfeld[2][2] == XO)||
+    function pruefenUnentschieden(element){
+        return element != "";
+    };
 
-        (erstelleSpielfeld.spielfeld[0][0] == XO && erstelleSpielfeld.spielfeld[1][1] == XO && erstelleSpielfeld.spielfeld[2][2] == XO)||
-        (erstelleSpielfeld.spielfeld[2][0] == XO && erstelleSpielfeld.spielfeld[1][1] == XO && erstelleSpielfeld.spielfeld[0][2] == XO)
+    function pruefenVonGewinner(markeSpieler){
+        if((erstelleSpielfeld.spielfeld[0][0] == markeSpieler && erstelleSpielfeld.spielfeld[0][1] == markeSpieler && erstelleSpielfeld.spielfeld[0][2] == markeSpieler)||
+        (erstelleSpielfeld.spielfeld[1][0] == markeSpieler && erstelleSpielfeld.spielfeld[1][1] == markeSpieler && erstelleSpielfeld.spielfeld[1][2] == markeSpieler)||
+        (erstelleSpielfeld.spielfeld[2][0] == markeSpieler && erstelleSpielfeld.spielfeld[2][1] == markeSpieler && erstelleSpielfeld.spielfeld[2][2] == markeSpieler)||
+
+        (erstelleSpielfeld.spielfeld[0][0] == markeSpieler && erstelleSpielfeld.spielfeld[1][0] == markeSpieler && erstelleSpielfeld.spielfeld[2][0] == markeSpieler)||
+        (erstelleSpielfeld.spielfeld[0][1] == markeSpieler && erstelleSpielfeld.spielfeld[1][1] == markeSpieler && erstelleSpielfeld.spielfeld[2][1] == markeSpieler)||
+        (erstelleSpielfeld.spielfeld[0][2] == markeSpieler && erstelleSpielfeld.spielfeld[1][2] == markeSpieler && erstelleSpielfeld.spielfeld[2][2] == markeSpieler)||
+
+        (erstelleSpielfeld.spielfeld[0][0] == markeSpieler && erstelleSpielfeld.spielfeld[1][1] == markeSpieler && erstelleSpielfeld.spielfeld[2][2] == markeSpieler)||
+        (erstelleSpielfeld.spielfeld[2][0] == markeSpieler && erstelleSpielfeld.spielfeld[1][1] == markeSpieler && erstelleSpielfeld.spielfeld[0][2] == markeSpieler)
         ){
             return true;
         } else {
             return false;
         }
     };
+
+    function zurücksetzenSpiel(){
+        erstelleSpielfeld.spielfeld = [["","",""],["","",""],["","",""]];
+        spielfeldEinfrieren = false;
+        aktiverSpieler = 1;
+        console.clear();
+    };
     
     return {
         neueRunde,
         pruefenVonGewinner,
+        zurücksetzenSpiel,
     };
 };
 
@@ -120,9 +151,22 @@ const verbindungInDom = () => {
     document.getElementById("9.kachel").addEventListener("click", ()=> {
         variablenFürKacheln(2, 2);
     });
+
+    document.getElementById("neuesSpielButton").addEventListener("click", ()=> {
+        spiel.zurücksetzenSpiel();
+        frontendVerbindung.aenderungenUebernehmenImDom();
+    });
+
+    function aenderungenUebernehmenImDom(){
+        const arrayZumÜbernehmen = erstelleSpielfeld.spielfeld.flat();
+        for (let i = 0; i < arrayZumÜbernehmen.length; i++){
+            document.getElementById(`${i+1}.kachel`).textContent = arrayZumÜbernehmen[i];
+        };
+    }
     
     return {
         state,
+        aenderungenUebernehmenImDom,
     };
 };
     
